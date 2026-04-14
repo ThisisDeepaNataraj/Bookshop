@@ -1,0 +1,51 @@
+{% extends 'store/base.html' %}
+{% block title %}{{ book.title }} — Adaptive Bookshop{% endblock %}
+{% block content %}
+<div class="breadcrumb"><div class="breadcrumb-inner"><a href="{% url 'home' %}">Home</a> / <a href="{% url 'book_list' %}">Books</a> / {% if book.category %}<a href="{% url 'book_list' %}?category={{ book.category.slug }}">{{ book.category.name }}</a> / {% endif %}{{ book.title }}</div></div>
+<div class="book-detail">
+    <div>
+        <div class="book-detail-img">{% if book.image %}<img src="{{ book.image.url }}" alt="{{ book.title }}">{% else %}📖{% endif %}</div>
+    </div>
+    <div class="book-detail-info">
+        {% if book.category %}<div class="book-detail-category">{{ book.category.name }}</div>{% endif %}
+        <h1>{{ book.title }}</h1>
+        <div class="book-detail-author">by {{ book.author.name }}</div>
+        <div class="book-detail-price">₹{{ book.price }}</div>
+        <div class="book-detail-meta">
+            {% if book.isbn %}<div class="meta-item"><div class="meta-label">ISBN</div><div class="meta-value">{{ book.isbn }}</div></div>{% endif %}
+            {% if book.published_date %}<div class="meta-item"><div class="meta-label">Published</div><div class="meta-value">{{ book.published_date|date:"Y" }}</div></div>{% endif %}
+            <div class="meta-item"><div class="meta-label">Stock</div><div class="meta-value">{{ book.stock }} copies</div></div>
+            {% if book.category %}<div class="meta-item"><div class="meta-label">Genre</div><div class="meta-value">{{ book.category.name }}</div></div>{% endif %}
+        </div>
+        {% if book.is_in_stock %}<span class="stock-badge in-stock">✓ In Stock</span>{% else %}<span class="stock-badge out-stock">✗ Out of Stock</span>{% endif %}
+        <p class="book-detail-desc">{{ book.description }}</p>
+        <div class="detail-actions">
+            {% if book.is_in_stock %}<a href="{% url 'add_to_cart' book.pk %}" class="btn btn-primary">Add to Cart</a>{% endif %}
+            <a href="{% url 'book_list' %}" class="btn btn-secondary">← Back to Books</a>
+        </div>
+    </div>
+</div>
+{% if related_books %}
+<div class="related-section">
+    <div class="section-header"><div><div class="section-title">Related Books</div><div class="section-subtitle">You might also like</div></div></div>
+    <div class="book-grid">
+        {% for book in related_books %}
+        <div class="book-card">
+            <div class="book-card-img">{% if book.image %}<img src="{{ book.image.url }}" alt="{{ book.title }}">{% else %}📖{% endif %}</div>
+            <div class="book-card-body">
+                <div class="book-card-title">{{ book.title }}</div>
+                <div class="book-card-author">{{ book.author.name }}</div>
+                <div class="book-card-footer">
+                    <div class="book-card-price">₹{{ book.price }}</div>
+                    <div class="book-card-actions">
+                        <a href="{% url 'book_detail' book.pk %}" class="btn btn-secondary btn-sm">View</a>
+                        <a href="{% url 'add_to_cart' book.pk %}" class="btn btn-primary btn-sm">Add</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}

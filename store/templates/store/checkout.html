@@ -1,0 +1,67 @@
+{% extends 'store/base.html' %}
+{% block title %}Checkout — Adaptive Bookshop{% endblock %}
+{% block content %}
+<div class="page-header"><h1>Checkout</h1><p>Complete your order</p></div>
+<div class="checkout-container">
+    <div>
+        <div class="form-card">
+            <h2>Shipping Details</h2>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="form-row">
+                    <div class="form-group"><label>Full Name</label><input type="text" value="{{ user.get_full_name|default:user.username }}" readonly style="background:#f4faf4;"></div>
+                    <div class="form-group"><label>Phone Number *</label><input type="text" name="phone" placeholder="Enter phone number" required></div>
+                </div>
+                <div class="form-group"><label>Shipping Address *</label><textarea name="address" placeholder="Enter your full address" required></textarea></div>
+                <div class="form-group">
+                    <label>Payment Method *</label>
+                    <div class="payment-options">
+                        <label class="payment-option"><input type="radio" name="payment_method" value="cod" checked><div class="payment-card"><span class="payment-icon">🚚</span><div><strong>Cash on Delivery</strong><p>Pay when your order arrives</p></div></div></label>
+                        <label class="payment-option"><input type="radio" name="payment_method" value="upi"><div class="payment-card"><span class="payment-icon">📱</span><div><strong>UPI Payment</strong><p>GPay, PhonePe, Paytm</p></div></div></label>
+                        <label class="payment-option"><input type="radio" name="payment_method" value="card"><div class="payment-card"><span class="payment-icon">💳</span><div><strong>Credit / Debit Card</strong><p>Visa, Mastercard, Rupay</p></div></div></label>
+                        <label class="payment-option"><input type="radio" name="payment_method" value="netbanking"><div class="payment-card"><span class="payment-icon">🏦</span><div><strong>Net Banking</strong><p>All major banks supported</p></div></div></label>
+                    </div>
+                </div>
+                <div id="upi-details" style="display:none;" class="form-group"><label>UPI ID *</label><input type="text" name="upi_id" placeholder="yourname@upi"></div>
+                <div id="card-details" style="display:none;">
+                    <div class="form-group"><label>Card Number *</label><input type="text" name="card_number" placeholder="1234 5678 9012 3456" maxlength="19"></div>
+                    <div class="form-row">
+                        <div class="form-group"><label>Expiry *</label><input type="text" name="expiry" placeholder="MM/YY" maxlength="5"></div>
+                        <div class="form-group"><label>CVV *</label><input type="text" name="cvv" placeholder="123" maxlength="3"></div>
+                    </div>
+                </div>
+                <div id="netbanking-details" style="display:none;" class="form-group">
+                    <label>Select Bank *</label>
+                    <select name="bank"><option value="">-- Select Bank --</option><option>State Bank of India</option><option>HDFC Bank</option><option>ICICI Bank</option><option>Axis Bank</option><option>Kotak Mahindra Bank</option></select>
+                </div>
+                <div style="display:flex;gap:12px;margin-top:16px;">
+                    <a href="{% url 'cart' %}" class="btn btn-secondary">Back to Cart</a>
+                    <button type="submit" class="btn btn-primary">Place Order →</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="order-summary-sidebar">
+        <h3>Order Summary</h3>
+        {% for item in cart.items.all %}
+        <div class="order-item-row">
+            <div><div class="order-item-name">{{ item.book.title }}</div><div class="order-item-qty">Qty: {{ item.quantity }}</div></div>
+            <div class="order-item-price">₹{{ item.get_total_price }}</div>
+        </div>
+        {% endfor %}
+        <div class="order-total-row"><span>Total</span><span>₹{{ cart.get_total }}</span></div>
+    </div>
+</div>
+<script>
+document.querySelectorAll('input[name="payment_method"]').forEach(function(r){
+    r.addEventListener('change',function(){
+        document.getElementById('upi-details').style.display='none';
+        document.getElementById('card-details').style.display='none';
+        document.getElementById('netbanking-details').style.display='none';
+        if(this.value==='upi')document.getElementById('upi-details').style.display='block';
+        else if(this.value==='card')document.getElementById('card-details').style.display='block';
+        else if(this.value==='netbanking')document.getElementById('netbanking-details').style.display='block';
+    });
+});
+</script>
+{% endblock %}

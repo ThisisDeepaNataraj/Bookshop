@@ -1,0 +1,108 @@
+{% extends 'store/base.html' %}
+{% block title %}Adaptive Bookshop{% endblock %}
+{% block content %}
+
+<div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1>Discover Your Next<br><em>Great Read</em></h1>
+        <p>Explore thousands of books across every genre — fiction, science, self-help and more.</p>
+        <form class="hero-search" method="GET" action="{% url 'search' %}">
+            <select name="filter">
+                <option value="all">All Categories</option>
+                <option value="title">By Title</option>
+                <option value="author">By Author</option>
+                <option value="category">By Genre</option>
+            </select>
+            <input type="text" name="q" placeholder="Search books, authors, genres...">
+            <button type="submit">Search</button>
+        </form>
+        <div class="hero-tags">
+            {% for category in categories %}
+            <a href="{% url 'book_list' %}?category={{ category.slug }}" class="hero-tag">{{ category.name }}</a>
+            {% endfor %}
+            <a href="{% url 'book_list' %}" class="hero-tag">All Books</a>
+        </div>
+    </div>
+</div>
+
+<div class="stats-bar">
+    <div class="stats-inner">
+        <div class="stat-item"><span class="stat-icon">📚</span><div class="stat-info"><strong>500+ Books</strong><span>In our collection</span></div></div>
+        <div class="stat-item"><span class="stat-icon">✍️</span><div class="stat-info"><strong>100+ Authors</strong><span>From around the world</span></div></div>
+        <div class="stat-item"><span class="stat-icon">🚚</span><div class="stat-info"><strong>Free Shipping</strong><span>On orders above ₹499</span></div></div>
+        <div class="stat-item"><span class="stat-icon">↩️</span><div class="stat-info"><strong>Easy Returns</strong><span>7 day return policy</span></div></div>
+    </div>
+</div>
+
+{% if featured_books %}
+<div class="section">
+    <div class="section-header">
+        <div><div class="section-title">Featured Books</div><div class="section-subtitle">Hand-picked by our editors</div></div>
+        <a href="{% url 'book_list' %}" class="section-link">View All →</a>
+    </div>
+    <div class="book-grid">
+        {% for book in featured_books %}
+        <div class="book-card">
+            <div class="book-card-img">
+                <span class="book-card-badge">Featured</span>
+                {% if not book.is_in_stock %}<span class="stock-out-badge">Out of Stock</span>{% endif %}
+                {% if book.image %}<img src="{{ book.image.url }}" alt="{{ book.title }}">{% else %}📖{% endif %}
+            </div>
+            <div class="book-card-body">
+                {% if book.category %}<div class="book-card-category">{{ book.category.name }}</div>{% endif %}
+                <div class="book-card-title">{{ book.title }}</div>
+                <div class="book-card-author">{{ book.author.name }}</div>
+                <div class="book-card-desc">{{ book.description|truncatewords:18 }}</div>
+                <div class="book-card-footer">
+                    <div class="book-card-price">₹{{ book.price }}</div>
+                    <div class="book-card-actions">
+                        <a href="{% url 'book_detail' book.pk %}" class="btn btn-secondary btn-sm">View</a>
+                        {% if book.is_in_stock %}<a href="{% url 'add_to_cart' book.pk %}" class="btn btn-primary btn-sm">Add to Cart</a>
+                        {% else %}<span class="btn btn-sm" style="background:#f5f5f5;color:#aaa;cursor:not-allowed;">Sold Out</span>{% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<div style="background:#f4faf4;">
+    <div class="section">
+        <div class="section-header">
+            <div><div class="section-title">Latest Arrivals</div><div class="section-subtitle">Fresh additions to our collection</div></div>
+            <a href="{% url 'book_list' %}" class="section-link">View All →</a>
+        </div>
+        <div class="book-grid">
+            {% for book in latest_books %}
+            <div class="book-card">
+                <div class="book-card-img">
+                    {% if not book.is_in_stock %}<span class="stock-out-badge">Out of Stock</span>{% endif %}
+                    {% if book.image %}<img src="{{ book.image.url }}" alt="{{ book.title }}">{% else %}📖{% endif %}
+                </div>
+                <div class="book-card-body">
+                    {% if book.category %}<div class="book-card-category">{{ book.category.name }}</div>{% endif %}
+                    <div class="book-card-title">{{ book.title }}</div>
+                    <div class="book-card-author">{{ book.author.name }}</div>
+                    <div class="book-card-desc">{{ book.description|truncatewords:18 }}</div>
+                    <div class="book-card-footer">
+                        <div class="book-card-price">₹{{ book.price }}</div>
+                        <div class="book-card-actions">
+                            <a href="{% url 'book_detail' book.pk %}" class="btn btn-secondary btn-sm">View</a>
+                            {% if book.is_in_stock %}<a href="{% url 'add_to_cart' book.pk %}" class="btn btn-primary btn-sm">Add to Cart</a>
+                            {% else %}<span class="btn btn-sm" style="background:#f5f5f5;color:#aaa;cursor:not-allowed;">Sold Out</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p style="color:#888;font-style:italic;">No books yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

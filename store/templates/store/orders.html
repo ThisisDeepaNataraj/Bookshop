@@ -1,0 +1,29 @@
+{% extends 'store/base.html' %}
+{% block title %}My Orders — Adaptive Bookshop{% endblock %}
+{% block content %}
+<div class="page-header"><h1>My Orders</h1><p>Track and manage your orders</p></div>
+<div class="orders-container">
+    {% for order in orders %}
+    <div class="order-card">
+        <div class="order-card-header">
+            <div><div class="order-id">Order #{{ order.id }}</div><div class="order-date">{{ order.created_at|date:"d M Y, h:i A" }}</div></div>
+            <span class="status-badge status-{{ order.status }}">{{ order.get_status_display }}</span>
+        </div>
+        <div class="order-card-body">
+            {% for item in order.items.all %}
+            <div class="order-item"><span>{{ item.book.title }} × {{ item.quantity }}</span><span>₹{{ item.get_total_price }}</span></div>
+            {% endfor %}
+        </div>
+        <div class="order-card-footer">
+            <div style="font-size:.82rem;color:#888;">📍 {{ order.shipping_address|truncatechars:50 }}</div>
+            <div class="order-total">Total: ₹{{ order.total_price }}</div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="empty-state">
+        <div class="empty-icon">📦</div><h3>No orders yet</h3><p>Start shopping to see your orders here!</p>
+        <a href="{% url 'book_list' %}" class="btn btn-primary">Browse Books</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends 'store/base.html' %}
+{% block title %}My Cart — Adaptive Bookshop{% endblock %}
+{% block content %}
+<div class="page-header"><h1>Shopping Cart</h1><p>Review your selected books</p></div>
+<div class="cart-container">
+    {% if cart.items.all %}
+    <div>
+        <table class="cart-table">
+            <thead><tr><th>Book</th><th>Price</th><th>Quantity</th><th>Total</th><th></th></tr></thead>
+            <tbody>
+                {% for item in cart.items.all %}
+                <tr>
+                    <td><div class="cart-book-title"><a href="{% url 'book_detail' item.book.pk %}">{{ item.book.title }}</a></div><div class="cart-book-author">{{ item.book.author.name }}</div></td>
+                    <td>₹{{ item.book.price }}</td>
+                    <td><form method="POST" action="{% url 'update_cart' item.pk %}" class="quantity-form">{% csrf_token %}<input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="99"><button type="submit" class="btn btn-secondary btn-xs">Update</button></form></td>
+                    <td><strong>₹{{ item.get_total_price }}</strong></td>
+                    <td><a href="{% url 'remove_from_cart' item.pk %}" class="btn btn-danger btn-xs">Remove</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{% url 'book_list' %}" class="btn btn-secondary" style="margin-top:16px;">← Continue Shopping</a>
+    </div>
+    <div class="cart-sidebar">
+        <h3>Order Summary</h3>
+        <div class="cart-summary-row"><span>Subtotal</span><span>₹{{ cart.get_total }}</span></div>
+        <div class="cart-summary-row"><span>Shipping</span><span style="color:#4caf50;">{% if cart.get_total >= 499 %}Free{% else %}₹49{% endif %}</span></div>
+        <div class="cart-summary-total"><span>Total</span><span>₹{{ cart.get_total }}</span></div>
+        <a href="{% url 'checkout' %}" class="btn btn-primary">Proceed to Checkout</a>
+    </div>
+    {% else %}
+    <div class="empty-state" style="grid-column:1/-1;">
+        <div class="empty-icon">🛒</div><h3>Your cart is empty</h3><p>Add some books to get started!</p>
+        <a href="{% url 'book_list' %}" class="btn btn-primary">Browse Books</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

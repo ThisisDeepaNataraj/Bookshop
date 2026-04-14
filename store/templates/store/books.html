@@ -1,0 +1,53 @@
+{% extends 'store/base.html' %}
+{% block title %}Books — Adaptive Bookshop{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h1>{% if query %}Results for "{{ query }}"{% else %}All Books{% endif %}</h1>
+    <p>{% if query %}Showing search results{% else %}Browse our complete collection{% endif %}</p>
+</div>
+<div class="books-page">
+    <div class="books-sidebar">
+        <h4>Categories</h4>
+        <a href="{% url 'book_list' %}" class="sidebar-link {% if not selected_category %}active{% endif %}">All Books</a>
+        {% for category in categories %}
+        <a href="{% url 'book_list' %}?category={{ category.slug }}" class="sidebar-link {% if selected_category == category.slug %}active{% endif %}">{{ category.name }}</a>
+        {% endfor %}
+    </div>
+    <div>
+        <div class="books-main-header">
+            <span class="books-count">{{ books|length }} book{{ books|length|pluralize }} found</span>
+        </div>
+        <div class="book-grid">
+            {% for book in books %}
+            <div class="book-card">
+                <div class="book-card-img">
+                    {% if not book.is_in_stock %}<span class="stock-out-badge">Out of Stock</span>{% endif %}
+                    {% if book.image %}<img src="{{ book.image.url }}" alt="{{ book.title }}">{% else %}📖{% endif %}
+                </div>
+                <div class="book-card-body">
+                    {% if book.category %}<div class="book-card-category">{{ book.category.name }}</div>{% endif %}
+                    <div class="book-card-title">{{ book.title }}</div>
+                    <div class="book-card-author">{{ book.author.name }}</div>
+                    <div class="book-card-desc">{{ book.description|truncatewords:18 }}</div>
+                    <div class="book-card-footer">
+                        <div class="book-card-price">₹{{ book.price }}</div>
+                        <div class="book-card-actions">
+                            <a href="{% url 'book_detail' book.pk %}" class="btn btn-secondary btn-sm">View</a>
+                            {% if book.is_in_stock %}<a href="{% url 'add_to_cart' book.pk %}" class="btn btn-primary btn-sm">Add to Cart</a>
+                            {% else %}<span class="btn btn-sm" style="background:#f5f5f5;color:#aaa;cursor:not-allowed;">Sold Out</span>{% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state" style="grid-column:1/-1;">
+                <div class="empty-icon">🔍</div>
+                <h3>No books found</h3>
+                <p>Try a different search or browse all categories.</p>
+                <a href="{% url 'book_list' %}" class="btn btn-primary">View All Books</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
